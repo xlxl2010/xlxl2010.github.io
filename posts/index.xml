@@ -1,0 +1,96 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>所有文章 - 万物皆对象</title>
+        <link>https://example.com/posts/</link>
+        <description>所有文章 | 万物皆对象</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>824379598@qq.com (醉清风)</managingEditor>
+            <webMaster>824379598@qq.com (醉清风)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sat, 26 Jun 2021 09:10:29 &#43;0800</lastBuildDate><atom:link href="https://example.com/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>多线程编程</title>
+    <link>https://example.com/thread/</link>
+    <pubDate>Sat, 26 Jun 2021 09:10:29 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/thread/</guid>
+    <description><![CDATA[<div class="featured-image">
+                <img src="/featured-image.jpg" referrerpolicy="no-referrer">
+            </div><h4 id="一个多线程的问题用三个线程顺序打印字母a-z输出结果是1a-2b-3c-1d-2e打印完毕最后输出一个ok">一个多线程的问题，用三个线程，顺序打印字母A-Z，输出结果是1A 2B 3C 1D 2E…打印完毕最后输出一个Ok。</h4>]]></description>
+</item><item>
+    <title>常用mysql语句汇总</title>
+    <link>https://example.com/sql/</link>
+    <pubDate>Wed, 09 Jun 2021 08:57:27 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/sql/</guid>
+    <description><![CDATA[<h3 id="创建数据库并制定编码">创建数据库并制定编码</h3>
+<ul>
+<li>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-sql" data-lang="sql"><span class="k">Create</span><span class="w"> </span><span class="k">database</span><span class="w"> </span><span class="err">数据库名</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nb">character</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">utf8</span><span class="p">;</span><span class="w">
+</span><span class="w"></span><span class="k">Create</span><span class="w"> </span><span class="k">database</span><span class="w"> </span><span class="n">ssm</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="nb">character</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">utf8</span><span class="p">;</span><span class="w">
+</span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>]]></description>
+</item><item>
+    <title>Filechannel 源码分析</title>
+    <link>https://example.com/filechannel/</link>
+    <pubDate>Mon, 07 Jun 2021 17:55:28 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/filechannel/</guid>
+    <description><![CDATA[<p>我们以FileOutputStream的getChannel为例:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">FileChannel</span> <span class="nf">getChannel</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">channel</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">FileChannelImpl</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="n">append</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">channel</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>FileChannel类图:</p>]]></description>
+</item><item>
+    <title>HashMap 源码分析</title>
+    <link>https://example.com/hashmap/</link>
+    <pubDate>Tue, 01 Jun 2021 17:55:28 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/hashmap/</guid>
+    <description><![CDATA[<p>类图如下:</p>]]></description>
+</item><item>
+    <title>linux-基础</title>
+    <link>https://example.com/linux-base/</link>
+    <pubDate>Tue, 01 Jun 2021 17:55:28 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/linux-base/</guid>
+    <description><![CDATA[<p>linux-基础常用操作以及概念.</p>]]></description>
+</item><item>
+    <title>Markdown 基本语法</title>
+    <link>https://example.com/basic-markdown-syntax/</link>
+    <pubDate>Sun, 01 Dec 2019 21:57:40 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/basic-markdown-syntax/</guid>
+    <description><![CDATA[<p>这篇文章提供了可以在 Hugo 的文章中使用的基本 Markdown 语法示例.</p>]]></description>
+</item><item>
+    <title>Emoji 支持</title>
+    <link>https://example.com/emoji-support/</link>
+    <pubDate>Tue, 01 Oct 2019 17:55:28 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://example.com/emoji-support/</guid>
+    <description><![CDATA[<p>Emoji 可以通过多种方式在 Hugo 项目中启用.</p>]]></description>
+</item></channel>
+</rss>

@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Filechannel 源码分析 - 万物皆对象</title><meta name="Description" content="Filechannel 源码分析."><meta property="og:title" content="Filechannel 源码分析" />
+<meta property="og:description" content="Filechannel 源码分析." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://example.com/filechannel/" /><meta property="og:image" content="https://example.com/filechannel/featured-image.jpg"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-06-07T17:55:28&#43;08:00" />
+<meta property="article:modified_time" content="2021-06-09T11:39:35&#43;08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://example.com/filechannel/featured-image.jpg"/>
+<meta name="twitter:title" content="Filechannel 源码分析"/>
+<meta name="twitter:description" content="Filechannel 源码分析."/>
+<meta name="application-name" content="万物皆对象">
+<meta name="apple-mobile-web-app-title" content="万物皆对象"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://example.com/filechannel/" /><link rel="prev" href="https://example.com/hashmap/" /><link rel="next" href="https://example.com/sql/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Filechannel 源码分析",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/example.com\/filechannel\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/example.com\/filechannel\/featured-image.jpg",
+                            "width":  1073 ,
+                            "height":  529 
+                        }],"genre": "posts","keywords": "jdk","wordcount":  6921 ,
+        "url": "https:\/\/example.com\/filechannel\/","datePublished": "2021-06-07T17:55:28+08:00","dateModified": "2021-06-09T11:39:35+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": {
+                    "@type": "ImageObject",
+                    "url": "https:\/\/example.com\/images\/avatar.png",
+                    "width":  512 ,
+                    "height":  512 
+                }},"author": {
+                "@type": "Person",
+                "name": "醉清风"
+            },"description": "Filechannel 源码分析."
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="万物皆对象"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw'></i></span>万物皆对象</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/categories/documentation/"> 文档 </a><a class="menu-item" href="/about/"> 关于 </a><a class="menu-item" href="https://github.com/dillonzq/LoveIt" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i>  </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item language" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                        <select class="language-select" id="language-select-desktop" onchange="location = this.value;"><option value="/filechannel/" selected>简体中文</option></select>
+                    </a><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="万物皆对象"><span class="header-title-pre"><i class='far fa-kiss-wink-heart fa-fw'></i></span>万物皆对象</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/categories/documentation/" title="">文档</a><a class="menu-item" href="/about/" title="">关于</a><a class="menu-item" href="https://github.com/dillonzq/LoveIt" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i></a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a><a href="javascript:void(0);" class="menu-item" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                    <select class="language-select" onchange="location = this.value;"><option value="/filechannel/" selected>简体中文</option></select>
+                </a></div>
+    </div>
+</header>
+<div class="search-dropdown desktop">
+    <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+    <div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">Filechannel 源码分析</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw"></i>醉清风</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/documentation/"><i class="far fa-folder fa-fw"></i>文档</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-06-07">2021-06-07</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 6921 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 14 分钟&nbsp;<span id="/filechannel/" class="leancloud_visitors" data-flag-title="Filechannel 源码分析">
+                        <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;次阅读
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/filechannel/featured-image.jpg"
+        data-srcset="/filechannel/featured-image.jpg, /filechannel/featured-image.jpg 1.5x, /filechannel/featured-image.jpg 2x"
+        data-sizes="auto"
+        alt="/filechannel/featured-image.jpg"
+        title="Filechannel 源码分析." /></div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#规则检查">规则检查</a></li>
+    <li><a href="#大小检查">大小检查</a></li>
+    <li><a href="#映射">映射</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#逻辑验证">逻辑验证</a></li>
+    <li><a href="#filelocktable">FileLockTable</a></li>
+    <li><a href="#加锁">加锁</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>我们以FileOutputStream的getChannel为例:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">FileChannel</span> <span class="nf">getChannel</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">channel</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">channel</span> <span class="o">=</span> <span class="n">FileChannelImpl</span><span class="o">.</span><span class="na">open</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">,</span> <span class="n">append</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">channel</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>FileChannel类图:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="FileChannel.jpg"
+        data-srcset="/filechannel/FileChannel.jpg, FileChannel.jpg 1.5x, /filechannel/FileChannel.jpg 2x"
+        data-sizes="auto"
+        alt="/filechannel/FileChannel.jpg"
+        title="FileChannel类图" /></p>
+<p>有几点值得注意:</p>
+<ul>
+<li>InputStream和OutputStream不是线程安全的，而通道(Channel)是线程安全的。</li>
+<li>Channel根据注释的解释，是一组IO操作的联结。</li>
+<li>GatheringByteChannel，顾名思义就是将一组ByteBuffer的数据收集/组合起来，所以它继承自WritableByteChannel。</li>
+<li>ScatteringByteChannel，即将一个通道的数据分散到多个ByteBuffer之中。</li>
+</ul>
+<p>其实FileChannelImpl便是FileChannel的子类，位于包sun.nio.ch中，其源码可以从openjdk的jdk\src\share\classes\sun\nio\ch目录找到，open方法源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">static</span> <span class="n">FileChannel</span> <span class="nf">open</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">String</span> <span class="n">path</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">readable</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">writable</span><span class="o">,</span>
+    <span class="kt">boolean</span> <span class="n">append</span><span class="o">,</span> <span class="n">Object</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">FileChannelImpl</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">path</span><span class="o">,</span> <span class="n">readable</span><span class="o">,</span> <span class="n">writable</span><span class="o">,</span> <span class="n">append</span><span class="o">,</span> <span class="n">parent</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看出，getChannel的原理就是构造了一个FileChannelImpl对象，此对象中保存有对应的流的是否可读、追加、文件描述符等属性。</p>
+<p>从这里也可以看出，从输出流获取的通道由于<strong>readable被设为false，所以这个通道也就变成了不可读的</strong>。</p>
+<h1 id="写">写</h1>
+<p>FileChannelImpl.write简略版源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">int</span> <span class="nf">write</span><span class="o">(</span><span class="n">ByteBuffer</span> <span class="n">src</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">positionLock</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">begin</span><span class="o">();</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="na">add</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
+                <span class="k">return</span> <span class="n">0</span><span class="o">;</span>
+            <span class="k">do</span> <span class="o">{</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">src</span><span class="o">,</span> <span class="o">-</span><span class="n">1</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
+            <span class="k">return</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">normalize</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">threads</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">ti</span><span class="o">);</span>
+            <span class="n">end</span><span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">);</span>
+            <span class="k">assert</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">check</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>实际上从这里我们可以看出通道的可中断是怎样实现的(IO流并不可以被中断)。begin方法在父类AbstractInterruptibleChannel中实现:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">protected</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">begin</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">interruptor</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">interruptor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Interruptible</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">interrupt</span><span class="o">(</span><span class="n">Thread</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">closeLock</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="k">if</span> <span class="o">(!</span><span class="n">open</span><span class="o">)</span>
+                            <span class="k">return</span><span class="o">;</span>
+                        <span class="n">open</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+                        <span class="n">interrupted</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span>
+                        <span class="k">try</span> <span class="o">{</span>
+                            <span class="n">AbstractInterruptibleChannel</span><span class="o">.</span><span class="na">this</span><span class="o">.</span><span class="na">implCloseChannel</span><span class="o">();</span>
+                        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
+                    <span class="o">}</span>
+                <span class="o">}};</span>
+    <span class="o">}</span>
+    <span class="n">blockedOn</span><span class="o">(</span><span class="n">interruptor</span><span class="o">);</span>
+    <span class="n">Thread</span> <span class="n">me</span> <span class="o">=</span> <span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">me</span><span class="o">.</span><span class="na">isInterrupted</span><span class="o">())</span>
+        <span class="n">interruptor</span><span class="o">.</span><span class="na">interrupt</span><span class="o">(</span><span class="n">me</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>blockedOn实际上调用的是Thread的blockedOn方法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">void</span> <span class="nf">blockedOn</span><span class="o">(</span><span class="n">Interruptible</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">blockerLock</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">blocker</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>当所在线程被中断时，blocker对象的interrupt方法将会被调用，结合上面begin方法的实现，即当发生中断时，blocker将会关闭通道，这样也就退出了阻塞。Interruptible接口定义在sun.nio.ch中，从Thread的blocker对象的注释中可以看出，此对象是专门为实现可中断的IO而设置的。</p>
+<p>IOUtil.write的调用全部发生在sun包内，我们忽略复杂的调用关系，看一下本质: FileDispatcherImpl.c的Java_sun_nio_ch_FileDispatcherImpl_write0方法实现(简略版):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jint</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileDispatcherImpl_write0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jclass</span> <span class="n">clazz</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">fdo</span><span class="p">,</span>
+    <span class="n">jlong</span> <span class="n">address</span><span class="p">,</span> <span class="n">jint</span> <span class="n">len</span><span class="p">,</span> <span class="n">jboolean</span> <span class="n">append</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">WriteFile</span><span class="p">(</span><span class="n">h</span><span class="p">,</span>           <span class="cm">/* File handle to write */</span>
+                  <span class="p">(</span><span class="n">LPCVOID</span><span class="p">)</span><span class="n">address</span><span class="p">,</span> <span class="cm">/* pointers to the buffers */</span>
+                  <span class="n">len</span><span class="p">,</span>              <span class="cm">/* number of bytes to write */</span>
+                  <span class="o">&amp;</span><span class="n">written</span><span class="p">,</span>         <span class="cm">/* receives number of bytes written */</span>
+                  <span class="n">lpOv</span><span class="p">);</span>            <span class="cm">/* overlapped struct */</span>
+    <span class="k">return</span> <span class="n">convertReturnVal</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="p">(</span><span class="n">jint</span><span class="p">)</span><span class="n">written</span><span class="p">,</span> <span class="n">JNI_FALSE</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>所以，通过FileOutputStream还是FileChannel进行数据的写入，在系统层面都是一样的。</p>
+<p>但是要注意，不同于OutputStream的write方法，这里的返回值是int。也就是说，<strong>通道的write方法并不保证一定将我们给定的数据一次性写出</strong>，正确的写姿势应该是这样的:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="k">while</span> <span class="o">(</span><span class="n">buf</span><span class="o">.</span><span class="na">hasRemaining</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">channel</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buf</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>那么问题来了，既然通道和OutputStream是使用的同一个系统级API，那么后者是怎么实现的?</p>
+<p>玄机在于jdk\src\share\native\java\io\io_util.c的writeBytes方法其实已经帮我们实现了循环过程，关键源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="k">while</span> <span class="p">(</span><span class="n">len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="n">GET_FD</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">fid</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">JNU_ThrowIOException</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&#34;Stream Closed&#34;</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">append</span> <span class="o">==</span> <span class="n">JNI_TRUE</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">IO_Append</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="o">+</span><span class="n">off</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">IO_Write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">buf</span><span class="o">+</span><span class="n">off</span><span class="p">,</span> <span class="n">len</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">JNU_ThrowIOExceptionWithLastError</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&#34;Write error&#34;</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">off</span> <span class="o">+=</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">len</span> <span class="o">-=</span> <span class="n">n</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h1 id="读">读</h1>
+<p>IOUtil.read源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">static</span> <span class="kt">int</span> <span class="nf">read</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="n">ByteBuffer</span> <span class="n">dst</span><span class="o">,</span> <span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="n">NativeDispatcher</span> <span class="n">nd</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">dst</span> <span class="k">instanceof</span> <span class="n">DirectBuffer</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">readIntoNativeBuffer</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">dst</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
+    <span class="c1">// Substitute a native buffer
+</span><span class="c1"></span>    <span class="n">ByteBuffer</span> <span class="n">bb</span> <span class="o">=</span> <span class="n">Util</span><span class="o">.</span><span class="na">getTemporaryDirectBuffer</span><span class="o">(</span><span class="n">dst</span><span class="o">.</span><span class="na">remaining</span><span class="o">());</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">readIntoNativeBuffer</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">bb</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
+        <span class="n">bb</span><span class="o">.</span><span class="na">flip</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span>
+            <span class="n">dst</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">bb</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="n">Util</span><span class="o">.</span><span class="na">offerFirstTemporaryDirectBuffer</span><span class="o">(</span><span class="n">bb</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>从这里可以看到一个有意思的问题，如果传入的Buffer不是direct buffer，那么先将数据读取到一个direct buffer，再全部拷贝到给定的buffer中，写其实也是这样的，这么做是为了填jvm实现的坑，参考知乎R大的回答:</p>
+<p><a href="https://www.zhihu.com/question/57374068/answer/152691891" target="_blank" rel="noopener noreffer">Java NIO中，关于DirectBuffer，HeapBuffer的疑问？</a></p>
+<p>FileDispatcherImpl.c的Java_sun_nio_ch_FileDispatcherImpl_read0关键源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jint</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileDispatcherImpl_read0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jclass</span> <span class="n">clazz</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">fdo</span><span class="p">,</span>
+                                      <span class="n">jlong</span> <span class="n">address</span><span class="p">,</span> <span class="n">jint</span> <span class="n">len</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">DWORD</span> <span class="n">read</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">ReadFile</span><span class="p">(</span><span class="n">h</span><span class="p">,</span>          <span class="cm">/* File handle to read */</span>
+                      <span class="p">(</span><span class="n">LPVOID</span><span class="p">)</span><span class="n">address</span><span class="p">,</span>    <span class="cm">/* address to put data */</span>
+                      <span class="n">len</span><span class="p">,</span>        <span class="cm">/* number of bytes to read */</span>
+                      <span class="o">&amp;</span><span class="n">read</span><span class="p">,</span>      <span class="cm">/* number of bytes read */</span>
+                      <span class="nb">NULL</span><span class="p">);</span>      <span class="cm">/* no overlapped struct */</span>
+    <span class="k">return</span> <span class="n">convertReturnVal</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="p">(</span><span class="n">jint</span><span class="p">)</span><span class="n">read</span><span class="p">,</span> <span class="n">JNI_TRUE</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>虽然没有展开FileInputStream的源码，但是可以想到和写一样，其实都是对Windows API ReadFile的调用。</p>
+<h1 id="position">position</h1>
+<p>当前文件位置的读取和设置其实是通过一个方法完成的，FileChannelImpl.position0:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kd">native</span> <span class="kt">long</span> <span class="nf">position0</span><span class="o">(</span><span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">,</span> <span class="kt">long</span> <span class="n">offset</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果offset为-1，即表示读。实现位于FileChannelImpl.c中:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jlong</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileChannelImpl_position0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">this</span><span class="p">,</span>
+                                          <span class="n">jobject</span> <span class="n">fdo</span><span class="p">,</span> <span class="n">jlong</span> <span class="n">offset</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">DWORD</span> <span class="n">lowPos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">highPos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">HANDLE</span> <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="n">HANDLE</span><span class="p">)(</span><span class="n">handleval</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">fdo</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">lowPos</span> <span class="o">=</span> <span class="n">SetFilePointer</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">highPos</span><span class="p">,</span> <span class="n">FILE_CURRENT</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">lowPos</span> <span class="o">=</span> <span class="p">(</span><span class="n">DWORD</span><span class="p">)</span><span class="n">offset</span><span class="p">;</span>
+        <span class="n">highPos</span> <span class="o">=</span> <span class="p">(</span><span class="kt">long</span><span class="p">)(</span><span class="n">offset</span> <span class="o">&gt;&gt;</span> <span class="mi">32</span><span class="p">);</span>
+        <span class="n">lowPos</span> <span class="o">=</span> <span class="n">SetFilePointer</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">lowPos</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">highPos</span><span class="p">,</span> <span class="n">FILE_BEGIN</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(((</span><span class="n">jlong</span><span class="p">)</span><span class="n">highPos</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="p">)</span> <span class="o">|</span> <span class="n">lowPos</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>SetFilePointer便是Windows API。</p>
+<p>使用position时注意两点:</p>
+<ul>
+<li>如果将位置设置在文件结束符之后，然后试图从文件通道中读取数据，读方法将返回-1 —— 文件结束标志。</li>
+<li>如果将位置设置在文件结束符之后，然后向通道中写数据，文件将撑大到当前位置并写入数据。这可能导致“文件空洞”，磁盘上物理文件中写入的数据间有空隙。</li>
+</ul>
+<h1 id="文件裁剪truncate">文件裁剪/truncate</h1>
+<p>方法声明:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="n">FileChannel</span> <span class="nf">truncate</span><span class="o">(</span><span class="kt">long</span> <span class="n">size</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>此方法的效果是size后面的部分都会被删除，同时position也会被设置到新的位置。</p>
+<p>native实现位于FileDispatcherImpl.c:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jint</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileDispatcherImpl_truncate0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">this</span><span class="p">,</span>
+                                             <span class="n">jobject</span> <span class="n">fdo</span><span class="p">,</span> <span class="n">jlong</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">lowPos</span> <span class="o">=</span> <span class="n">SetFilePointer</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">lowPos</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">highPos</span><span class="p">,</span> <span class="n">FILE_BEGIN</span><span class="p">);</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">SetEndOfFile</span><span class="p">(</span><span class="n">h</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>API SetEndOfFile的意思 是将当前位置(position)设为文件的末尾，这样就可以理解了。</p>
+<h1 id="强制刷新">强制刷新</h1>
+<p>方法声明:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="kt">void</span> <span class="nf">force</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">metaData</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>此方法会导致被操作系统缓存在内存中的数据强制刷新到磁盘，参数metaData表示是否需要同时将元信息(比如权限信息)刷新至磁盘。</p>
+<p>底层实现其实是对Windows API FlushFileBuffers的调用。</p>
+<h1 id="transfertotransferfrom">transferTo/transferFrom</h1>
+<p>这就是所谓的零拷贝技术，主要运用在从磁盘读取数据并通过网络进行发送这一场景，可将内存拷贝次数从4次(含两次内核空间和用户空间的相互拷贝)减少到2次。参考:</p>
+<p><a href="https://my.oschina.net/cloudcoder/blog/299944" target="_blank" rel="noopener noreffer">JAVA Zero Copy的相关知识</a></p>
+<p>我们以transferTo为例进行说明，FileChannelImpl.transferTo的实现很有意思:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">long</span> <span class="nf">transferTo</span><span class="o">(</span><span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">count</span><span class="o">,</span><span class="n">WritableByteChannel</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Attempt a direct transfer, if the kernel supports it
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">((</span><span class="n">n</span> <span class="o">=</span> <span class="n">transferToDirectly</span><span class="o">(</span><span class="n">position</span><span class="o">,</span> <span class="n">icount</span><span class="o">,</span> <span class="n">target</span><span class="o">))</span> <span class="o">&gt;=</span> <span class="n">0</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+    <span class="c1">// Attempt a mapped transfer, but only to trusted channel types
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">((</span><span class="n">n</span> <span class="o">=</span> <span class="n">transferToTrustedChannel</span><span class="o">(</span><span class="n">position</span><span class="o">,</span> <span class="n">icount</span><span class="o">,</span> <span class="n">target</span><span class="o">))</span> <span class="o">&gt;=</span> <span class="n">0</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">;</span>
+    <span class="c1">// Slow path for untrusted targets
+</span><span class="c1"></span>    <span class="k">return</span> <span class="n">transferToArbitraryChannel</span><span class="o">(</span><span class="n">position</span><span class="o">,</span> <span class="n">icount</span><span class="o">,</span> <span class="n">target</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看出，将首先尝试进行零拷贝，一旦出错了(即返回错误的值)就表示内核不支持。transferToDirectly的native实现位于FileChannelImpl的transferTo0函数，Windows版的实现十分简单粗暴:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jlong</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileChannelImpl_transferTo0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">this</span><span class="p">,</span>
+                                            <span class="n">jint</span> <span class="n">srcFD</span><span class="p">,</span>
+                                            <span class="n">jlong</span> <span class="n">position</span><span class="p">,</span> <span class="n">jlong</span> <span class="n">count</span><span class="p">,</span>
+                                            <span class="n">jint</span> <span class="n">dstFD</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">IOS_UNSUPPORTED</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>就是不支持。来看看隔壁Linux的实现:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="n">jlong</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileChannelImpl_transferTo0</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">this</span><span class="p">,</span>
+                                            <span class="n">jint</span> <span class="n">srcFD</span><span class="p">,</span>
+                                            <span class="n">jlong</span> <span class="n">position</span><span class="p">,</span> <span class="n">jlong</span> <span class="n">count</span><span class="p">,</span>
+                                            <span class="n">jint</span> <span class="n">dstFD</span><span class="p">){</span>
+<span class="cp">#if defined(__linux__)
+</span><span class="cp"></span>    <span class="n">off64_t</span> <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">off64_t</span><span class="p">)</span><span class="n">position</span><span class="p">;</span>
+    <span class="n">jlong</span> <span class="n">n</span> <span class="o">=</span> <span class="n">sendfile64</span><span class="p">(</span><span class="n">dstFD</span><span class="p">,</span> <span class="n">srcFD</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">offset</span><span class="p">,</span> <span class="p">(</span><span class="n">size_t</span><span class="p">)</span><span class="n">count</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EAGAIN</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">IOS_UNAVAILABLE</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EINVAL</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">((</span><span class="n">ssize_t</span><span class="p">)</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">IOS_UNSUPPORTED_CASE</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">errno</span> <span class="o">==</span> <span class="n">EINTR</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">IOS_INTERRUPTED</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="n">JNU_ThrowIOExceptionWithLastError</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&#34;Transfer failed&#34;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">IOS_THROWN</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
+<span class="cp">#elif
+</span><span class="cp"></span><span class="c1">//忽略solaris, mac等版本
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>sendfile64便是linux的底层实现了。</p>
+<p>从transferTo源码可以看出，如果内核不支持零拷贝，Java将尝试利用map实现，map是个什么东西，参加下面。</p>
+<p>如果map也不支持，transferToArbitraryChannel所做的便是最low的方式: 先把数据从一个通道拷贝出来，再写到另一个通道，说的就是你，Windows。</p>
+<h1 id="内存映射">内存映射</h1>
+<p>方法声明:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="n">MappedByteBuffer</span> <span class="nf">map</span><span class="o">(</span><span class="n">MapMode</span> <span class="n">mode</span><span class="o">,</span> <span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">size</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>能够将一个文件映射到内存中，从而加快数据的读取速度，注意，如果只需要对一个文件进行少数据量(KB级)的读写，那么直接读写的性能其实更好，内存映射只有在数据量大、多次读写的情况下才能表现出来。MapMode共有三种取值:</p>
+<ul>
+<li>READ_ONLY，只读</li>
+<li>READ_WRITE，读写，任何写操作的结果都会被同步到磁盘</li>
+<li>PRIVATE，可读写，类似于copy on write，一个线程进行写操作会导致创建一个副本，而其它线程看不到当前线程的修改</li>
+</ul>
+<p>Java中共有三个类可以获取到FileChannel，分别是FileOutputStream, FileInputStream和RandomAccessFile，考虑到它们分别是可写的，可读的和可读写的，所以每各类获得的通道分别可以使用哪些MapMode有一定的限制，总结如下:</p>
+<table>
+<thead>
+<tr>
+<th>类名</th>
+<th>FileOutputStream</th>
+<th>FileInputStream</th>
+<th>RandomAccessFile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MapMode</td>
+<td>无</td>
+<td>READ_ONLY</td>
+<td>全部</td>
+</tr>
+</tbody>
+</table>
+<p>map的Java实现位于FileChannelImpl中，下面分部分进行说明.</p>
+<h2 id="规则检查">规则检查</h2>
+<p>此部分对应上表的map规则，相应源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="k">if</span> <span class="o">((</span><span class="n">mode</span> <span class="o">!=</span> <span class="n">MapMode</span><span class="o">.</span><span class="na">READ_ONLY</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">writable</span><span class="o">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">NonWritableChannelException</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(!</span><span class="n">readable</span><span class="o">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">NonReadableChannelException</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="大小检查">大小检查</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">long</span> <span class="n">filesize</span><span class="o">;</span>
+<span class="k">do</span> <span class="o">{</span>
+    <span class="n">filesize</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">size</span><span class="o">(</span><span class="n">fd</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">filesize</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
+<span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="c1">//如果需要的大小大于实际的文件大小，那么对文件进行虚扩大
+</span><span class="c1"></span><span class="k">if</span> <span class="o">(</span><span class="n">filesize</span> <span class="o">&lt;</span> <span class="n">position</span> <span class="o">+</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// Extend file size
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(!</span><span class="n">writable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">IOException</span><span class="o">(</span><span class="s">&#34;Channel not open for writing &#34;</span> <span class="o">+</span>
+            <span class="s">&#34;- cannot extend file to required size&#34;</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">rv</span><span class="o">;</span>
+    <span class="k">do</span> <span class="o">{</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">truncate</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">position</span> <span class="o">+</span> <span class="n">size</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">rv</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="c1">//需要的大小为0，返回一个逗你玩的buffer
+</span><span class="c1"></span><span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">==</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">addr</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+    <span class="c1">// a valid file descriptor is not required
+</span><span class="c1"></span>    <span class="n">FileDescriptor</span> <span class="n">dummy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileDescriptor</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">((!</span><span class="n">writable</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">imode</span> <span class="o">==</span> <span class="n">MAP_RO</span><span class="o">))</span>
+        <span class="k">return</span> <span class="n">Util</span><span class="o">.</span><span class="na">newMappedByteBufferR</span><span class="o">(</span><span class="n">0</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">dummy</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">Util</span><span class="o">.</span><span class="na">newMappedByteBuffer</span><span class="o">(</span><span class="n">0</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">dummy</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="映射">映射</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">int</span> <span class="n">pagePosition</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">position</span> <span class="o">%</span> <span class="n">allocationGranularity</span><span class="o">);</span>
+<span class="kt">long</span> <span class="n">mapPosition</span> <span class="o">=</span> <span class="n">position</span> <span class="o">-</span> <span class="n">pagePosition</span><span class="o">;</span>
+<span class="kt">long</span> <span class="n">mapSize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">+</span> <span class="n">pagePosition</span><span class="o">;</span>
+<span class="n">addr</span> <span class="o">=</span> <span class="n">map0</span><span class="o">(</span><span class="n">imode</span><span class="o">,</span> <span class="n">mapPosition</span><span class="o">,</span> <span class="n">mapSize</span><span class="o">);</span>
+<span class="n">FileDescriptor</span> <span class="n">mfd</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="na">duplicateForMapping</span><span class="o">(</span><span class="n">fd</span><span class="o">);</span>
+<span class="kt">int</span> <span class="n">isize</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">size</span><span class="o">;</span>
+<span class="n">Unmapper</span> <span class="n">um</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Unmapper</span><span class="o">(</span><span class="n">addr</span><span class="o">,</span> <span class="n">mapSize</span><span class="o">,</span> <span class="n">isize</span><span class="o">,</span> <span class="n">mfd</span><span class="o">);</span>
+<span class="k">if</span> <span class="o">((!</span><span class="n">writable</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">imode</span> <span class="o">==</span> <span class="n">MAP_RO</span><span class="o">))</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Util</span><span class="o">.</span><span class="na">newMappedByteBufferR</span><span class="o">(</span><span class="n">isize</span><span class="o">,</span>
+                                     <span class="n">addr</span> <span class="o">+</span> <span class="n">pagePosition</span><span class="o">,</span>
+                                     <span class="n">mfd</span><span class="o">,</span>
+                                     <span class="n">um</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">Util</span><span class="o">.</span><span class="na">newMappedByteBuffer</span><span class="o">(</span><span class="n">isize</span><span class="o">,</span>
+                                    <span class="n">addr</span> <span class="o">+</span> <span class="n">pagePosition</span><span class="o">,</span>
+                                    <span class="n">mfd</span><span class="o">,</span>
+                                    <span class="n">um</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>map0的linux实现由系统调用mmap完成，返回映射文件的内存地址。duplicateForMapping用于复制句柄，在Windows上需要这么做，但在linux上不需要。</p>
+<p>Util.newMappedByteBuffer(R)方法实际上是构造了一个direct buffer，buffer的起始地址便是mmap返回的内存地址。</p>
+<h1 id="文件锁">文件锁</h1>
+<p>我们以方法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">abstract</span> <span class="n">FileLock</span> <span class="nf">lock</span><span class="o">(</span><span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">size</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">shared</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>为例，参数position和size的作用是<strong>lock方法允许我们针对文件的某一部分进行锁定</strong>，shared参数用以控制获取的是<strong>共享锁还是排它锁</strong>，默认锁定(即无参数lock方法)全部文件、排它锁。</p>
+<p><strong>文件锁是针对进程(即一个JVM虚拟机)而言的，<strong>所以如果当前JVM已拥有文件的锁，而此JVM的另一个线程又尝试获取锁(同一个文件，有重复的区域)，那么会抛出OverlappingFileLockException(共享锁、排它锁都会抛出)，这是符合逻辑的，因为同一个JVM内的多个线程之间安全性</strong>应该由程序自己维护，而不是文件锁</strong>。</p>
+<p>以上提到的特性很容易利用以下代码进行验证，假设有线程如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">GETLock</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">FileChannel</span> <span class="n">channel</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">start</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">end</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nf">GETLock</span><span class="o">(</span><span class="n">FileChannel</span> <span class="n">channel</span><span class="o">,</span> <span class="kt">int</span> <span class="n">start</span><span class="o">,</span> <span class="kt">int</span> <span class="n">end</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">channel</span> <span class="o">=</span> <span class="n">channel</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">start</span> <span class="o">=</span> <span class="n">start</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">end</span> <span class="o">=</span> <span class="n">end</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">FileLock</span> <span class="n">lock</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="na">lock</span><span class="o">(</span><span class="n">start</span><span class="o">,</span> <span class="n">end</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">&#34;获得锁&#34;</span><span class="o">);</span>
+        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">2000</span><span class="o">);</span>
+        <span class="n">lock</span><span class="o">.</span><span class="na">release</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>验证代码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&#34;test&#34;</span><span class="o">);</span>
+<span class="n">FileChannel</span> <span class="n">channel</span> <span class="o">=</span> <span class="k">new</span> <span class="n">RandomAccessFile</span><span class="o">(</span><span class="n">file</span><span class="o">,</span> <span class="s">&#34;rw&#34;</span><span class="o">).</span><span class="na">getChannel</span><span class="o">();</span>
+<span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="k">new</span> <span class="n">GETLock</span><span class="o">(</span><span class="n">channel</span><span class="o">,</span> <span class="n">0</span><span class="o">,</span> <span class="n">2</span><span class="o">)).</span><span class="na">start</span><span class="o">();</span>
+<span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="k">new</span> <span class="n">GETLock</span><span class="o">(</span><span class="n">channel</span><span class="o">,</span> <span class="n">1</span><span class="o">,</span> <span class="n">3</span><span class="o">)).</span><span class="na">start</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>只要文件区域出现重复，便会抛出异常。</p>
+<p>FileLock位于nio包，类图:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="FileLock.jpg"
+        data-srcset="/filechannel/FileLock.jpg, FileLock.jpg 1.5x, /filechannel/FileLock.jpg 2x"
+        data-sizes="auto"
+        alt="/filechannel/FileLock.jpg"
+        title="FileLock类图" /></p>
+<p>Java层面的实现位于FileChannelImpl.lock，下面对其进行分部分说明。</p>
+<h2 id="逻辑验证">逻辑验证</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="k">if</span> <span class="o">(</span><span class="n">shared</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">readable</span><span class="o">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">NonReadableChannelException</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(!</span><span class="n">shared</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">writable</span><span class="o">)</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="n">NonWritableChannelException</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>很容易理解，共享锁即读锁，如果获取到的通道不能读那么共享锁也就没有意义了 ，每种通道分别可以获得何种锁整理如下表:</p>
+<table>
+<thead>
+<tr>
+<th>类名</th>
+<th>FileInputStream</th>
+<th>FileOutputStream</th>
+<th>RandomAccessFile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可获得的锁</td>
+<td>共享锁</td>
+<td>排它锁</td>
+<td>全部</td>
+</tr>
+</tbody>
+</table>
+<h2 id="filelocktable">FileLockTable</h2>
+<p>如上文所述，<strong>文件锁的作用域为整个虚拟机</strong>，也就是说，两个channel如果对同一个文件的重复区域进行加锁，势必会导致OverlappingFileLockException，那么Java是如何在整个虚拟机范围(全局)进行检查的呢?答案便是FileLockTable。</p>
+<p>其位于sun.nio.ch下，类图:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="FileLockTable.jpg"
+        data-srcset="/filechannel/FileLockTable.jpg, FileLockTable.jpg 1.5x, /filechannel/FileLockTable.jpg 2x"
+        data-sizes="auto"
+        alt="/filechannel/FileLockTable.jpg"
+        title="FileLockTable类图" /></p>
+<p>相关源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">FileLockImpl</span> <span class="n">fli</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileLockImpl</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">position</span><span class="o">,</span> <span class="n">size</span><span class="o">,</span> <span class="n">shared</span><span class="o">);</span>
+<span class="n">FileLockTable</span> <span class="n">flt</span> <span class="o">=</span> <span class="n">fileLockTable</span><span class="o">();</span>
+<span class="n">flt</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">fli</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>fileLockTable方法决定采用FileLockTable的哪一个实现类:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="n">FileLockTable</span> <span class="nf">fileLockTable</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">fileLockTable</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">fileLockTable</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">isSharedFileLockTable</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">fileLockTable</span> <span class="o">=</span> <span class="n">FileLockTable</span><span class="o">.</span><span class="na">newSharedFileLockTable</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">fd</span><span class="o">);</span>
+                <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                    <span class="n">fileLockTable</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SimpleFileLockTable</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">fileLockTable</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里使用了一个双重检查，当然fileLockTable是volatile的。核心在于isSharedFileLockTable方法:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isSharedFileLockTable</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">propertyChecked</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">synchronized</span> <span class="o">(</span><span class="n">FileChannelImpl</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">propertyChecked</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">AccessController</span><span class="o">.</span><span class="na">doPrivileged</span><span class="o">(</span>
+                    <span class="k">new</span> <span class="n">GetPropertyAction</span><span class="o">(</span>
+                        <span class="s">&#34;sun.nio.ch.disableSystemWideOverlappingFileLockCheck&#34;</span><span class="o">));</span>
+                <span class="n">isSharedFileLockTable</span> <span class="o">=</span> <span class="o">((</span><span class="n">value</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">||</span> <span class="n">value</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">&#34;false&#34;</span><span class="o">));</span>
+                <span class="n">propertyChecked</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">isSharedFileLockTable</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看出，这里其实是根据属性disableSystemWideOverlappingFileLockCheck来决定是否采用全局模式，当然value默认为null.</p>
+<p>那么SharedFileLockTable又是如何保证的呢?玄机就在于其保存文件锁的载体:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kd">static</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;</span><span class="n">FileKey</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">FileLockReference</span><span class="o">&gt;&gt;</span> <span class="n">lockMap</span> <span class="o">=</span>
+        <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;</span><span class="n">FileKey</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">FileLockReference</span><span class="o">&gt;&gt;();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>静态。map的key为FileKey对象，由SharedFileLockTable的构造器创建:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">SharedFileLockTable</span><span class="o">(</span><span class="n">Channel</span> <span class="n">channel</span><span class="o">,</span> <span class="n">FileDescriptor</span> <span class="n">fd</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">channel</span> <span class="o">=</span> <span class="n">channel</span><span class="o">;</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">fileKey</span> <span class="o">=</span> <span class="n">FileKey</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">fd</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>FileKey是平台相关的，我们来看一下Linux的实现，类图:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="FileKey.jpg"
+        data-srcset="/filechannel/FileKey.jpg, FileKey.jpg 1.5x, /filechannel/FileKey.jpg 2x"
+        data-sizes="auto"
+        alt="/filechannel/FileKey.jpg"
+        title="FileKey类图" /></p>
+<p>st_dev是所在设备的ID，st_ino是文件的inode号，静态方法create完成了native方法init的调用:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">JNIEXPORT</span> <span class="kt">void</span> <span class="n">JNICALL</span>
+<span class="nf">Java_sun_nio_ch_FileKey_init</span><span class="p">(</span><span class="n">JNIEnv</span> <span class="o">*</span><span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">this</span><span class="p">,</span> <span class="n">jobject</span> <span class="n">fdo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">stat64</span> <span class="n">fbuf</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">res</span><span class="p">;</span>
+    <span class="n">RESTARTABLE</span><span class="p">(</span><span class="n">fstat64</span><span class="p">(</span><span class="n">fdval</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">fdo</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">fbuf</span><span class="p">),</span> <span class="n">res</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">res</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">JNU_ThrowIOExceptionWithLastError</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&#34;fstat64 failed&#34;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">//设置st_dev和st_ino
+</span><span class="c1"></span>        <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">SetLongField</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">key_st_dev</span><span class="p">,</span> <span class="p">(</span><span class="n">jlong</span><span class="p">)</span><span class="n">fbuf</span><span class="p">.</span><span class="n">st_dev</span><span class="p">);</span>
+        <span class="p">(</span><span class="o">*</span><span class="n">env</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">SetLongField</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">key_st_ino</span><span class="p">,</span> <span class="p">(</span><span class="n">jlong</span><span class="p">)</span><span class="n">fbuf</span><span class="p">.</span><span class="n">st_ino</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>fstat64就是fstat函数，为Linux下的系统调用，用以获得文件的相关信息。</p>
+<p>map的value中FileLockReference为对FileLock的弱引用。</p>
+<p>到这里SharedFileLockTable的add方法的逻辑就很容易想到了: 如果map中不存在此文件的记录，添加之，如果存在，检查是否有区域重复。</p>
+<p>重复性检查由SharedFileLockTable的checkList完成，源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">private</span> <span class="kt">void</span> <span class="nf">checkList</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">FileLockReference</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">,</span> <span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">FileLockReference</span> <span class="n">ref</span><span class="o">:</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">FileLock</span> <span class="n">fl</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">fl</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">fl</span><span class="o">.</span><span class="na">overlaps</span><span class="o">(</span><span class="n">position</span><span class="o">,</span> <span class="n">size</span><span class="o">))</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">OverlappingFileLockException</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>FileLock.overlaps:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kt">boolean</span> <span class="nf">overlaps</span><span class="o">(</span><span class="kt">long</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">size</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">position</span> <span class="o">+</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="k">this</span><span class="o">.</span><span class="na">position</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>               <span class="c1">// That is below this
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">position</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">size</span> <span class="o">&lt;=</span> <span class="n">position</span><span class="o">)</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>               <span class="c1">// This is below that
+</span><span class="c1"></span>    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>一目了然。</p>
+<h2 id="加锁">加锁</h2>
+<p>native方法Java_sun_nio_ch_FileDispatcherImpl_lock0完成，linux实现由函数fcntl完成，可以参考:</p>
+<p><a href="http://www.cnblogs.com/xuyh/p/3278881.html" target="_blank" rel="noopener noreffer">linux 文件记录锁详解</a></p>
+<h1 id="size">size</h1>
+<p>用以获取文件的大小，Linux实现和FileKey的init方法一样，由fstat完成，注意File的length方法的Linux实现由stat完成。而stat和fstat的主要区别是后者的第一个参数为文件描述符(只有打开了文件才会有)，而前者的第一个参数是绝对的路径，不要求打开文件，这就和Java里两者的区别很好的印证。</p>
+<h1 id="关闭">关闭</h1>
+<p>FileChannel继承自AbstractInterruptibleChannel，通道关闭有此类实现，包括Socket通道也是如此:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">closeLock</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">open</span><span class="o">)</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="n">open</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="n">implCloseChannel</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>implCloseChannel方法由FileChannelImpl实现:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">implCloseChannel</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// Release and invalidate any locks that we still hold
+</span><span class="c1"></span>    <span class="k">if</span> <span class="o">(</span><span class="n">fileLockTable</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">FileLock</span> <span class="n">fl</span><span class="o">:</span> <span class="n">fileLockTable</span><span class="o">.</span><span class="na">removeAll</span><span class="o">())</span> <span class="o">{</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="n">fl</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">fl</span><span class="o">.</span><span class="na">isValid</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="n">nd</span><span class="o">.</span><span class="na">release</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">fl</span><span class="o">.</span><span class="na">position</span><span class="o">(),</span> <span class="n">fl</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+                    <span class="o">((</span><span class="n">FileLockImpl</span><span class="o">)</span><span class="n">fl</span><span class="o">).</span><span class="na">invalidate</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="n">threads</span><span class="o">.</span><span class="na">signalAndWait</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">parent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">((</span><span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Closeable</span><span class="o">)</span><span class="n">parent</span><span class="o">).</span><span class="na">close</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="n">nd</span><span class="o">.</span><span class="na">close</span><span class="o">(</span><span class="n">fd</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>分为如下几步:</p>
+<ul>
+<li>
+<p>线程唤醒, 在Linux上如果有线程阻塞在一个文件描述符上，那么即使此文件描述符(FD)被关闭，被阻塞的线程也不会被唤醒，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="n">threads</span><span class="o">.</span><span class="na">signalAndWait</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>正是用于将这些线程手动唤醒，threads是一个NativeThreadSet类型，在任何IO操作(比如write方法)前被加入，这一点可以在第一节&quot;写&quot;中得到验证。</p>
+</li>
+<li>
+<p>清除文件锁表</p>
+</li>
+<li>
+<p>调用依赖的资源的close方法。</p>
+</li>
+</ul>
+<p>关于唤醒线程安全这一点，其实有一个隐含的线程安全的问题，结合read方法源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kt">int</span> <span class="nf">read</span><span class="o">(</span><span class="n">ByteBuffer</span> <span class="n">dst</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="n">ensureOpen</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">readable</span><span class="o">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="n">NonReadableChannelException</span><span class="o">();</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="n">positionLock</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">ti</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">begin</span><span class="o">();</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="na">add</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">isOpen</span><span class="o">())</span>
+                <span class="k">return</span> <span class="n">0</span><span class="o">;</span>
+            <span class="c1">//here!
+</span><span class="c1"></span>            <span class="k">do</span> <span class="o">{</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">IOUtil</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">fd</span><span class="o">,</span> <span class="n">dst</span><span class="o">,</span> <span class="o">-</span><span class="n">1</span><span class="o">,</span> <span class="n">nd</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">while</span> <span class="o">((</span><span class="n">n</span> <span class="o">==</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">INTERRUPTED</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">isOpen</span><span class="o">());</span>
+            <span class="k">return</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">normalize</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">threads</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">ti</span><span class="o">);</span>
+            <span class="n">end</span><span class="o">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">);</span>
+            <span class="k">assert</span> <span class="n">IOStatus</span><span class="o">.</span><span class="na">check</span><span class="o">(</span><span class="n">n</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果进行通道关闭的线程唤醒被阻塞的线程、关闭文件描述符这一过程在读线程的最后一次isOpen检查和read调用之间完成(即上面源码中here处)完成，由于内核会对文件描述符进行回收(重用)，这样完全会导致<strong>read操作读取的是一个全新的文件描述符!</strong></p>
+<p>JDK解决的办法在于NativeThreadSet.signalAndWait中(简略版):</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">void</span> <span class="nf">signalAndWait</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">used</span> <span class="o">&gt;</span> <span class="n">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">wait</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">interrupted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>used表示正在进行读写的线程数，可以看出，<strong>只要尚有线程正在进行读写操作，关闭线程就会阻塞</strong>。那什么时候被唤醒呢?remove方法源码:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">synchronized</span> <span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">elts</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">0</span><span class="o">;</span>
+        <span class="n">used</span><span class="o">--;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">used</span> <span class="o">==</span> <span class="n">0</span> <span class="o">&amp;&amp;</span> <span class="n">waitingToEmpty</span><span class="o">)</span>
+            <span class="n">notifyAll</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这就保证了<strong>当进行实际的文件描述符关闭时，一定没有正在读写的线程</strong>，这就杜绝了上述情况的发生。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2021-06-09&nbsp;<a class="git-hash" href="https://github.com/dillonzq/LoveIt/commit/6bbb58945f15a86a46587a27bf3449fdd08f3b69" target="_blank" title="commit by xiongliang(ixiongliang@gmail.com) 6bbb58945f15a86a46587a27bf3449fdd08f3b69: update">
+                                    <i class="fas fa-hashtag fa-fw"></i>6bbb589</a></span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/filechannel/index.md" target="_blank">阅读原始文档</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://example.com/filechannel/" data-title="Filechannel 源码分析" data-hashtags="jdk"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://example.com/filechannel/" data-hashtag="jdk"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://example.com/filechannel/" data-title="Filechannel 源码分析"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://example.com/filechannel/" data-title="Filechannel 源码分析"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://example.com/filechannel/" data-title="Filechannel 源码分析" data-ralateuid="xxxx"><i class="fab fa-weibo fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/jdk/">jdk</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/hashmap/" class="prev" rel="prev" title="HashMap 源码分析"><i class="fas fa-angle-left fa-fw"></i>HashMap 源码分析</a>
+            <a href="/sql/" class="next" rel="next" title="常用mysql语句汇总">常用mysql语句汇总<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2019 - 2021</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">醉清风</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"zh-cn","pageSize":10,"placeholder":"你的评论 ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"PASDMWALPK","algoliaIndex":"index.zh-cn","algoliaSearchKey":"b42948e51daaa93df92381c8e2ac0f93","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
