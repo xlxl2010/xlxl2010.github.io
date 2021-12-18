@@ -2,7 +2,7 @@
   "update": "Yes",
   "new_version": "1.0.1",
   "apk_file_url": "https://raw.githubusercontent.com/WVector/AppUpdateDemo/master/apk/sample-debug.apk",
-  "update_log": "1，增加装置状态模块1。\r\n2，增加装置监测模块2。\r\n3，增加装置操作模块3。\r\n4，增加系统配置模块4。\r\n5，其他功能优化。",
+  "update_log": "1，增加装置状态模块。\r\n2，增加装置监测模块。\r\n3，增加装置操作模块。\r\n4，增加系统配置模块。\r\n5，其他功能优化。",
   "target_size": "10M",
   "new_md5":"b97bea014531123f94c3ba7b7afbaad2",
   "constraint": false
