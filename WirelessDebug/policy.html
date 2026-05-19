@@ -128,8 +128,18 @@
     <li>开发新功能和内容</li>
 </ul>
 
+<h2>2.3 广告服务后台任务</h2>
+<p>为保障广告的正常展示和统计效果，Google AdMob服务可能在后台执行以下任务：</p>
+<ul>
+    <li>广告资源的预加载和缓存，以提升广告展示效率</li>
+    <li>广告展示数据的统计和上报，用于广告效果分析</li>
+    <li>广告策略的定时更新，确保广告内容的及时性</li>
+</ul>
+<p>这些后台任务可能通过系统机制（如WorkManager）在必要时触发，例如设备时间设置变更等场景。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
+
 <div class="highlight">
-<strong>重要提示：</strong>我们不会将您的个人信息出售给第三方。广告相关的标识符和设备信息仅用于提供广告服务。
+<strong>重要提示：</strong>我们不会将您的个人信息出售给第三方。广告相关的标识符和设备信息仅用于提供广告服务。<br>
+<strong>自启动说明：</strong>为保障广告服务的正常运行，应用可能在服务所必需的范围内执行后台任务，例如广告资源预加载、数据统计上报等。这些后台活动仅在合理服务场景下进行，并已采取措施限制其频率和范围。
 </div>
 </div>
 
@@ -139,6 +149,13 @@
 
 <h2>3.1 Google AdMob</h2>
 <p>Google AdMob是Google提供的移动广告平台。Google AdMob会收集设备标识符、位置信息、广告交互数据等，用于提供个性化广告服务。</p>
+<p><strong>自启动服务说明：</strong>为保障广告的正常展示和统计效果，Google AdMob服务可能需要在设备上执行后台任务，例如：</p>
+<ul>
+    <li>广告资源的预加载和缓存，以提升广告展示效率</li>
+    <li>广告展示数据的统计和上报，用于广告效果分析</li>
+    <li>广告策略的定时更新，确保广告内容的及时性</li>
+</ul>
+<p>这些后台任务可能通过系统机制（如WorkManager）在必要时触发，例如设备时间设置变更等场景。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
 <p>Google AdMob的隐私政策：<a href="https://policies.google.com/technologies/ads" target="_blank">https://policies.google.com/technologies/ads</a></p>
 <p>Google隐私政策：<a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></p>
 
