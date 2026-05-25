@@ -70,7 +70,7 @@
         <div class="app-name">应用名称：粒子手电筒软件</div>
         <div class="developer">开发者：熊亮</div>
         <div class="developer">版本：1.0</div>
-        <div class="developer">更新日期：2025年5月9日</div>
+        <div class="developer">更新日期：2026年5月23日</div>
     </div>
 
 <div class="content-box">
@@ -88,16 +88,16 @@
 <p>我们可能会收集您的设备信息，包括但不限于：</p>
 <ul>
     <li>设备型号、操作系统版本、屏幕分辨率</li>
-    <li>设备唯一标识符（如IMEI、Android ID）</li>
-    <li>网络信息（IP地址、运营商信息）</li>
+    <li>设备唯一标识符（如IMEI、Android ID、OAID）</li>
+    <li>网络信息（IP地址、运营商信息、网络类型）</li>
 </ul>
 
 <h2>1.2 广告标识符</h2>
 <p>为了向您展示广告，我们可能会收集：</p>
 <ul>
-    <li>广告标识符（GAID/IDFA）</li>
+    <li>广告标识符（OAID、GAID、IDFA）</li>
     <li>设备使用行为信息</li>
-    <li>广告交互数据（点击、浏览记录）</li>
+    <li>广告交互数据（展示、点击、转化记录）</li>
 </ul>
 
 <h2>1.3 使用信息</h2>
@@ -113,7 +113,7 @@
 <p>我们收集的信息将用于以下目的：</p>
 
 <h2>2.1 广告服务</h2>
-<p>我们使用Google AdMob广告服务来展示广告。通过收集的信息，我们可以：</p>
+<p>我们使用友盟U-AppWin（友盟+流量联盟）广告服务来展示广告。通过收集的信息，我们可以：</p>
 <ul>
     <li>向您展示相关性更高的广告</li>
     <li>统计广告展示次数和点击次数</li>
@@ -129,13 +129,13 @@
 </ul>
 
 <h2>2.3 广告服务后台任务</h2>
-<p>为保障广告的正常展示和统计效果，Google AdMob服务可能在后台执行以下任务：</p>
+<p>为保障广告的正常展示和统计效果，U-AppWin广告服务可能在后台执行以下任务：</p>
 <ul>
     <li>广告资源的预加载和缓存，以提升广告展示效率</li>
     <li>广告展示数据的统计和上报，用于广告效果分析</li>
     <li>广告策略的定时更新，确保广告内容的及时性</li>
 </ul>
-<p>这些后台任务可能通过系统机制（如WorkManager）在必要时触发，例如设备时间设置变更等场景。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
+<p>这些后台任务可能通过系统机制在必要时触发。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
 
 <div class="highlight">
 <strong>重要提示：</strong>我们不会将您的个人信息出售给第三方。广告相关的标识符和设备信息仅用于提供广告服务。<br>
@@ -147,23 +147,23 @@
 <div class="content-box">
 <p>本应用使用以下第三方服务：</p>
 
-<h2>3.1 Google AdMob</h2>
-<p>Google AdMob是Google提供的移动广告平台。Google AdMob会收集设备标识符、位置信息、广告交互数据等，用于提供个性化广告服务。</p>
-<p><strong>自启动服务说明：</strong>为保障广告的正常展示和统计效果，Google AdMob服务可能需要在设备上执行后台任务，例如：</p>
+<h2>3.1 友盟U-AppWin广告服务</h2>
+<p>友盟U-AppWin是友盟+提供的移动广告流量联盟平台。U-AppWin会收集设备标识符（包括OAID）、位置信息、广告交互数据等，用于提供个性化广告服务。</p>
+<p><strong>自启动服务说明：</strong>为保障广告的正常展示和统计效果，U-AppWin服务可能需要在设备上执行后台任务，例如：</p>
 <ul>
     <li>广告资源的预加载和缓存，以提升广告展示效率</li>
     <li>广告展示数据的统计和上报，用于广告效果分析</li>
     <li>广告策略的定时更新，确保广告内容的及时性</li>
 </ul>
-<p>这些后台任务可能通过系统机制（如WorkManager）在必要时触发，例如设备时间设置变更等场景。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
-<p>Google AdMob的隐私政策：<a href="https://policies.google.com/technologies/ads" target="_blank">https://policies.google.com/technologies/ads</a></p>
-<p>Google隐私政策：<a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></p>
+<p>这些后台任务可能在必要时触发。我们已采取措施限制此类后台活动仅在服务所必需的范围内进行。</p>
+<p>友盟+隐私政策：<a href="https://www.umeng.com/page/policy" target="_blank">https://www.umeng.com/page/policy</a></p>
 
-<h2>3.2 Google Play服务</h2>
-<p>用于广告标识符获取和广告服务支持。</p>
+<h2>3.2 友盟统计SDK</h2>
+<p>用于应用使用数据统计和分析，收集设备信息、使用时长、崩溃日志等，以帮助改进应用质量和用户体验。</p>
+<p>友盟+隐私政策：<a href="https://www.umeng.com/page/policy" target="_blank">https://www.umeng.com/page/policy</a></p>
 
 <h2>3.3 数据传输说明</h2>
-<p>使用Google AdMob服务时，您的设备信息、广告标识符和广告交互数据可能会被发送至Google服务器（位于美国或其他地区）进行处理。Google将根据其隐私政策处理这些数据。</p>
+<p>使用U-AppWin服务时，您的设备信息、广告标识符和广告交互数据可能会被发送至友盟+服务器（位于中国境内）进行处理。友盟+将根据其隐私政策处理这些数据。</p>
 </div>
 
 <h1>4. 信息披露</h1>
@@ -206,9 +206,10 @@
 <ul>
     <li>在Android设备上：设置 → Google → 广告 → 关闭"个性化广告"</li>
     <li>重置广告标识符：设置 → Google → 广告 → 重置广告标识符</li>
+    <li>在支持OAID的设备上，可通过系统设置限制广告跟踪</li>
 </ul>
 <div class="highlight">
-<strong>注意：</strong>即使您退出个性化广告，您仍会看到广告，但广告的相���性可能会降低。
+<strong>注意：</strong>即使您退出个性化广告，您仍会看到广告，但广告的相关性可能会降低。
 </div>
 </div>
 
